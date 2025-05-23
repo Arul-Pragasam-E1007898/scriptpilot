@@ -59,10 +59,13 @@ src/main/java/com/freshworks/ex/
 
 ## Key Components
 
-1**Entity Classes**: Custom data structures for the application
-2**Proxy Pattern**: Implementation of the proxy design pattern
-3**Scenarios**: Various example use cases and implementations
-4**Utilities**: Helper functions and common operations
+1. **Entity Classes**: Custom data structures for the application
+
+2. **Proxy Pattern**: Implementation of the proxy design pattern
+
+3. **Scenarios**: Various example use cases and implementations
+
+4. **Utilities**: Helper functions and common operations
 
 ## Dependencies
 

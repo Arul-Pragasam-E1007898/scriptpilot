@@ -10,14 +10,17 @@ public class TestcaseRepository {
     private static List<Testcase> testcases = Arrays.asList(
             newCase(1, """
                     Generate a unique dynamic random email address using yopmail domain
+                    and then create contact using generated email address
                     and then fetch the created contact
                     """, Category.Requester),
             newCase(2, """
                     Generate a unique dynamic random email address using yopmail domain 
+                    and then create contact using generated email address
                     and then delete the created contact
                     """, Category.Requester),
             newCase(3, """
                     Generate a unique dynamic random email address using yopmail domain 
+                    and then create contact using generated email address
                     and then forget the created contact
                     """, Category.Requester)
     );
