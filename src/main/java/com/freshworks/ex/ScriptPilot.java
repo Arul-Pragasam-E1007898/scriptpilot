@@ -1,14 +1,15 @@
 package com.freshworks.ex;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.freshworks.ex.proxy.AgentGroupProxy;
 import com.freshworks.ex.proxy.AgentProxy;
 import com.freshworks.ex.proxy.DepartmentFieldsProxy;
 import com.freshworks.ex.proxy.DepartmentProxy;
 import com.freshworks.ex.proxy.RequesterProxy;
-import com.freshworks.ex.proxy.TicketProxy;
 import com.freshworks.ex.proxy.Workspaces;
 import com.freshworks.ex.scenarios.Testcase;
 import com.freshworks.ex.scenarios.TestcaseRepository;
@@ -24,66 +25,106 @@ public class ScriptPilot {
 
 	interface Assistant {
 		@SystemMessage("""
-				    You are a helpful Freshservice assistant capable of orchestrating sequences of API actions using a configured toolbox.
-				    - When a user request involves multiple steps, execute them sequentially, ensuring each step succeeds before continuing.
-				    - If any required parameters are missing, use Javadoc to infer appropriate defaults or generate realistic placeholder values.
-				    - For any creation tasks (e.g., creating a requester, workspace, etc.), generate and use a unique, random name unless specified.
-				    - Always return clear, structured output summarizing each step and indicating whether it passed or failed.
-				""")
+				      You are a reliable Freshservice assistant designed to orchestrate and execute full test cases via API actions in a sequential manner using a configured toolbox.
+
+				      - When a user request involves multiple steps, execute them sequentially, ensuring each step succeeds before continuing.
+				- If any required parameters are missing, use Javadoc to infer appropriate defaults or generate realistic placeholder values.
+				- For any creation tasks (e.g., creating a requester, workspace, etc.), generate and use a unique, random name unless specified.
+				- Always return clear, structured output summarizing each step and indicating whether it passed or failed.
+				      - Use the configured tools to run API actions as requested.
+				      """)
 		String execute(String userMessage);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		logger.info("Starting ScriptPilot application");
-		Assistant assistant = init();
+
+		// Load and filter non-empty API keys
+		String[] allKeys = { System.getenv("GOOGLE_API_KEY_1"), System.getenv("GOOGLE_API_KEY_2"),
+				System.getenv("GOOGLE_API_KEY_3") };
+
+		List<String> validKeys = new ArrayList<>();
+		for (String key : allKeys) {
+			if (key != null && !key.isBlank()) {
+				validKeys.add(key);
+			}
+		}
+
+		if (validKeys.isEmpty()) {
+			logger.error("No valid API keys found. Exiting.");
+			System.exit(1);
+		}
+
+		int keyIndex = 0;
+
 		for (Testcase testcase : TestcaseRepository.load()) {
+			if (!testcase.enabled()) {
+				logger.info("Skipping disabled testcase {}", testcase.id());
+				continue;
+			}
+
+			String prompt = testcase.steps();
+			if (prompt == null || prompt.isBlank()) {
+				logger.warn("Skipping testcase {} due to empty prompt", testcase.id());
+				continue;
+			}
+
+			String apiKey = validKeys.get(keyIndex);
+			keyIndex = (keyIndex + 1) % validKeys.size(); // round-robin
+
 			String results = null;
+			boolean success = false;
+
 			try {
-				String prompt = testcase.steps();
-				if (prompt == null || prompt.isBlank()) {
-					logger.warn("Skipping testcase {} due to empty prompt", testcase.id());
-					continue;
-				}
-				logger.info("Executing test case {}: {}", testcase.id(), prompt);
+				logger.info("Running testcase {} using API key {}", testcase.id(), maskKey(apiKey));
+				Assistant assistant = initWithKey(apiKey);
+
 				results = assistant.execute(prompt);
+
 				if (results == null || results.isBlank()) {
 					throw new Exception("Model returned empty response");
 				}
-				System.out.println("✅ Testcase Result: " + results);
+
+				success = true;
+
 			} catch (Exception e) {
-				logger.error("Assistant execution failed for testcase {}: {}", testcase.id(), e.getMessage(), e);
+				logger.error("Execution failed for testcase {} with key {}: {}", testcase.id(), maskKey(apiKey),
+						e.getMessage());
+				// Optional: logger.debug("Stack trace:", e);
 			}
+
+			if (!success) {
+				logger.error("Testcase {} failed using key {}", testcase.id(), maskKey(apiKey));
+			}
+
 			System.out.println("Final Output for Testcase " + testcase.id() + ": " + results);
+			Thread.sleep(2000);
 		}
+
+		logger.info("ScriptPilot application finished.");
 	}
 
-	private static Assistant init() {
-		// Initialize the services
-//		ContactProxy contactProxy = new ContactProxy("assinfocity13090501");
-		String email = "fs.test12@gmail.com";
-		String password = "freshservice321";
-		AgentProxy agentProxy = new AgentProxy("assinfocity13090501");
-		AgentGroupProxy agentGroupProxy = new AgentGroupProxy("assinfocity13090501");
-		TicketProxy ticketProxy = new TicketProxy("assinfocity13090501");
-		DepartmentProxy departmentProxy = new DepartmentProxy("assinfocity13090501");
-		RequesterProxy requesterProxy = new RequesterProxy("assinfocity13090501");
-		Workspaces workspaces = new Workspaces("assinfocity13090501", email, password);
-		DepartmentFieldsProxy depFields = new DepartmentFieldsProxy("assinfocity13090501", email, password);
+	private static Assistant initWithKey(String apiKey) {
+		ChatLanguageModel model = GoogleAiGeminiChatModel.builder().apiKey(apiKey).modelName("gemini-2.0-flash")
+				.logRequestsAndResponses(true).build();
 
-		// Create the chat model (replace with your OpenAI API key)
-		ChatLanguageModel model = GoogleAiGeminiChatModel.builder().apiKey(System.getenv("OPENAI_API_KEY"))
-				.modelName("gemini-2.0-flash").logRequestsAndResponses(true).build();
-		logger.info("Initialized OpenAI chat model" + model);
+		MessageWindowChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(1000);
 
-		// Create chat memory with a window of 10 messages
-		MessageWindowChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(50);
-		logger.debug("Created chat memory with window size: 50");
+		DepartmentProxy departmentProxy = new DepartmentProxy("obkinfocity17090631");
+		RequesterProxy requesterProxy = new RequesterProxy("obkinfocity17090631");
+		Workspaces workspaces = new Workspaces("obkinfocity17090631", "fs.test12@gmail.com", "freshservice321");
+		DepartmentFieldsProxy depFields = new DepartmentFieldsProxy("obkinfocity17090631", "fs.test12@gmail.com",
+				"freshservice321");
+		AgentProxy agentProxy = new AgentProxy("obkinfocity17090631");
 
-		// Create the assistant with function calling capability and chat memory
-		Assistant assistant = AiServices.builder(Assistant.class).chatLanguageModel(model).chatMemory(chatMemory)
-				.tools(requesterProxy, agentProxy, agentGroupProxy, ticketProxy, departmentProxy, workspaces, depFields)
-				.build();
-		logger.info("Assistant service initialized successfully");
-		return assistant;
+		return AiServices.builder(Assistant.class).chatLanguageModel(model).chatMemory(chatMemory)
+				.tools(agentProxy, requesterProxy, departmentProxy, workspaces, depFields).build();
 	}
+
+	private static String maskKey(String key) {
+		if (key == null || key.length() < 6)
+			return "****";
+		return key.substring(0, 3) + "..." + key.substring(key.length() - 3);
+	}
+
 }
