@@ -14,29 +14,38 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class AbstractProxy {
-	private static final Logger logger = LoggerFactory.getLogger(AbstractProxy.class);
-	protected final Serializer serializer;
-	protected final RestClient restClient;
+    private static final Logger logger = LoggerFactory.getLogger(AbstractProxy.class);
+    protected final Serializer serializer;
+    protected final RestClient restClient;
 
-	public AbstractProxy(String domain) {
-		logger.debug("Initializing AbstractProxy (legacy) with domain: {}", domain);
-		this.serializer = new Serializer();
-		this.restClient = new RestClient(domain);
-	}
+    /**
+     * Constructor for public API access using API key (no login, no CSRF).
+     * @param domain Freshservice domain like "freshworks299"
+     */
+    public AbstractProxy(String domain) {
+        logger.debug("Initializing AbstractProxy (public) with domain: {}", domain);
+        this.serializer = new Serializer();
+        this.restClient = RestClient.getPublicClient(domain);
+    }
 
-	public AbstractProxy(String domain, String email, String password) {
-		logger.debug("Initializing AbstractProxy (modern) with domain: {}, user: {}", domain, email);
-		String baseUrl = "https://" + domain + ".freshcmdb.com";
-		this.serializer = new Serializer();
-		this.restClient = new RestClient(baseUrl, email, password);
-	}
+    /**
+     * Constructor for private API access using email/password login + CSRF.
+     * @param domain Freshservice domain like "freshworks299"
+     * @param email login email
+     * @param password login password
+     */
+    public AbstractProxy(String domain, String email, String password) {
+        logger.debug("Initializing AbstractProxy (private) with domain: {}, user: {}", domain, email);
+        this.serializer = new Serializer();
+        this.restClient = RestClient.getPrivateClient(domain, email, password);
+    }
 
-	protected JsonNode parse(Response response) throws IOException {
-		Optional<ResponseBody> body = Optional.ofNullable(response.body());
-		if (body.isPresent()) {
-			String jsonStr = body.get().string();
-			return serializer.parse(jsonStr);
-		}
-		return null;
-	}
+    protected JsonNode parse(Response response) throws IOException {
+        Optional<ResponseBody> body = Optional.ofNullable(response.body());
+        if (body.isPresent()) {
+            String jsonStr = body.get().string();
+            return serializer.parse(jsonStr);
+        }
+        return null;
+    }
 }

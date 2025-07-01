@@ -18,41 +18,54 @@ import okhttp3.Response;
 
 public class RestClient {
     private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
-
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    private static RestClient publicClient;
+    private static RestClient privateClient;
+
     private final OkHttpClient client;
     private final String baseUrl;
     private String basicAuth;
     private String csrfToken;
     private boolean useCsrf = false;
 
-    /**
-     * Constructor for API key authentication.
+    // Private constructor to force usage of factory methods
+    private RestClient(String baseUrl) {
+        this.baseUrl = baseUrl;
+        this.client = new OkHttpClient();
+    }
+
+    /** 
+     * Factory method to get a singleton public client using API key authentication.
      * @param domain Freshservice domain like "freshworks299" — no protocol or slashes
      */
-    public RestClient(String domain) {
-        this.baseUrl = "https://" + domain + ".freshcmdb.com/api/v2";
-        this.client = new OkHttpClient();
+    public static synchronized RestClient getPublicClient(String domain) {
+        if (publicClient == null) {
+            publicClient = new RestClient("https://" + domain + ".freshcmdb.com/api/v2");
 
-        String apiKey = System.getenv("FS_API_KEY");
-        if (apiKey == null || apiKey.isEmpty()) {
-            logger.warn("FS_API_KEY not found in environment variables!");
+            String apiKey = System.getenv("FS_API_KEY");
+            if (apiKey == null || apiKey.isEmpty()) {
+                logger.warn("FS_API_KEY not found in environment variables!");
+            }
+            publicClient.basicAuth = "Basic " + Base64.getEncoder().encodeToString((apiKey + ":X").getBytes());
+            logger.debug("Initialized public RestClient with API key for domain: {}", domain);
         }
-        this.basicAuth = "Basic " + Base64.getEncoder().encodeToString((apiKey + ":X").getBytes());
-        logger.debug("Initialized RestClient with API key for domain: {}", domain);
+        return publicClient;
     }
 
     /**
-     * Constructor for email/password login + CSRF
+     * Factory method to get a singleton private client using email/password login + CSRF token.
      * @param domain Freshservice domain like "freshworks299"
      * @param email login email
      * @param password login password
      */
-    public RestClient(String domain, String email, String password) {
-        this.baseUrl = domain;
-        this.client = new OkHttpClient();
-        setBasicAuth(email, password);
-        loginAndFetchCsrf();
+    public static synchronized RestClient getPrivateClient(String domain, String email, String password) {
+        if (privateClient == null) {
+            privateClient = new RestClient("https://" + domain + ".freshcmdb.com/api/v2");
+            privateClient.setBasicAuth(email, password);
+            privateClient.loginAndFetchCsrf();
+        }
+        return privateClient;
     }
 
     private void setBasicAuth(String username, String password) {
@@ -78,7 +91,6 @@ public class RestClient {
                 this.csrfToken = root.path("meta").path("csrf_token").asText(null);
                 if (csrfToken != null && !csrfToken.isEmpty()) {
                     useCsrf = true;
-                    System.out.println("Login successful, CSRF token fetched.");
                 } else {
                     logger.warn("CSRF token not found in login response.");
                 }
@@ -189,5 +201,4 @@ public class RestClient {
         Request request = requestBuilder.build();
         return client.newCall(request).execute();
     }
-
 }

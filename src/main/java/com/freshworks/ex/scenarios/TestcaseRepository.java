@@ -166,7 +166,7 @@ public class TestcaseRepository {
 					  "assertion": "passed"
 					}
 					""",
-					Category.Requester, true),
+					Category.Requester, false),
 			newCase(8,
 					"""
 					You are testing a Java-based LangChain agent with tools for managing Freshservice requesters (contacts). Use the following sequence to validate the behavior of the tools from `RequesterProxy`. Ensure every step includes:
@@ -218,7 +218,7 @@ public class TestcaseRepository {
 					13. Perform a delete on a malformed ID (e.g., null or "").
 					    - Assert that the API returns an appropriate error message.
 					""",
-					Category.Requester, true),
+					Category.Requester, false),
 			newCase(9,
 					"""
 					You are testing a Java-based LangChain agent with tools for managing Freshservice requesters (contacts). Use the following sequence to validate the behavior of the tools from `RequesterProxy`. Ensure every step includes:
@@ -238,7 +238,7 @@ public class TestcaseRepository {
 					   - Assert both actions complete successfully and data is cleaned up.
 					
 					""",
-					Category.Requester, true),
+					Category.Requester, false),
 			newCase(91,
 					"""
 					Create an agent with valid email address.
