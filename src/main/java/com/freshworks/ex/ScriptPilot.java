@@ -1,5 +1,8 @@
 package com.freshworks.ex;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,8 +11,8 @@ import com.freshworks.ex.proxy.ContactProxy;
 import com.freshworks.ex.proxy.DepartmentProxy;
 import com.freshworks.ex.proxy.RequesterProxy;
 import com.freshworks.ex.proxy.Workspaces;
-import com.freshworks.ex.scenarios.Testcase;
-import com.freshworks.ex.scenarios.TestcaseRepository;
+import com.freshworks.ex.utils.FreshReleaseClient;
+import com.freshworks.ex.utils.FreshReleaseClient.TestCase;
 import com.freshworks.ex.utils.SystemPromptLoader;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -27,14 +30,20 @@ public class ScriptPilot {
         String execute(String userMessage);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         logger.info("Starting ScriptPilot application");
 
         Assistant assistant = init();
-
-        for (Testcase testcase : TestcaseRepository.load()) {
-            String results = assistant.execute(testcase.steps());
-            System.out.println("Testcase : " + testcase.id() + ": " + results);
+        FreshReleaseClient freshReleaseClient = new FreshReleaseClient();
+        List<TestCase> testCases = freshReleaseClient.fetchTestCasesWithSteps();
+        if (testCases.isEmpty()) {
+			logger.warn("No test cases found. Exiting.");
+			System.exit(0);
+		}
+        for (TestCase testcase : testCases) {
+        	logger.info("Running testcase {}", testcase.getKey());
+            String results = assistant.execute(testcase.getSteps());
+            System.out.println("Testcase : " + testcase.getKey() + ": " + results);
         }
     }
 
