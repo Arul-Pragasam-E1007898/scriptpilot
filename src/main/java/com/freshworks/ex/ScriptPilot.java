@@ -1,6 +1,8 @@
 package com.freshworks.ex;
 
-import com.freshworks.ex.proxy.ContactProxy;
+import com.freshworks.ex.proxy.AgentProxy;
+import com.freshworks.ex.proxy.DepartmentProxy;
+import com.freshworks.ex.proxy.RequesterProxy;
 import com.freshworks.ex.scenarios.Testcase;
 import com.freshworks.ex.scenarios.TestcaseRepository;
 import com.freshworks.ex.utils.SystemPromptLoader;
@@ -51,7 +53,7 @@ public class ScriptPilot {
         // Create the assistant with function calling capability and chat memory
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
-                .tools(contactProxy, departmentProxy, requesterProxy, workspaces, agentProxy)
+                .tools(departmentProxy, requesterProxy, agentProxy)
                 .systemMessageProvider(chatMemoryId -> SYSTEM_PROMPT)
                 .build();
         logger.info("Assistant service initialized successfully");
