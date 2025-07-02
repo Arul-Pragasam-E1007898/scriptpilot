@@ -18,6 +18,7 @@ public class FsClient extends RestClient{
 
     @Override
     protected String authorization() {
-        return "";
+        logger.debug("Generating authorization header");
+        return "Basic " + java.util.Base64.getEncoder().encodeToString((apiKey + ":X").getBytes());
     }
 }

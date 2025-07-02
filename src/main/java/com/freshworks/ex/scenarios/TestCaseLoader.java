@@ -46,7 +46,8 @@ public class TestCaseLoader {
 	}
 
 	private TestCase convert(JsonNode testCase) {
-		return new TestCase(testCase.get("id").asText(),testCase.get("key").asText(),
+		return new TestCase(testCase.get("id").asText(),
+				testCase.get("key").asText(),
 				testCase.get("steps").asText());
 	}
 
