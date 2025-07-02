@@ -116,9 +116,7 @@ public class RequesterProxy extends AbstractProxy {
 	@Tool(name = "deactivateRequester")
 	public JsonNode deactivateRequester(Long id) throws IOException {
 		logger.info("Deactivating requester {}", id);
-		Map<String, Object> body = Map.of("active", false);
-		String payload = serializer.serialize(body);
-		return handleResponse(restClient.delete(REQUESTERS + "/" + id, payload), "deactivateRequester");
+		return handleResponse(restClient.delete(REQUESTERS + "/" + id), "deactivateRequester");
 	}
 
 	@Tool(name = "reactivateRequester")
