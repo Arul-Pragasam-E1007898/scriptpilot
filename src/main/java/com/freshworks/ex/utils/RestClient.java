@@ -2,6 +2,7 @@ package com.freshworks.ex.utils;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +183,15 @@ public class RestClient {
             response.code(), request.method(), request.url());
         return response;
     }
+    
+    public Response delete(String path, String payload) throws IOException {
+        String fullPath = normalizePath(path);
+        String url = baseUrl + fullPath;
+        logger.debug("DELETE {} with payload: {}", url, payload);
+        RequestBody body = RequestBody.create(payload, JSON);
+        Request request = applyHeaders(new Request.Builder().url(url).delete(body)).build();
+        return client.newCall(request).execute();
+    }
 
     /**
      * Generates the Basic Authentication header value using the API key.
@@ -192,5 +202,21 @@ public class RestClient {
     private String authorization() {
         logger.debug("Generating authorization header");
         return "Basic " + java.util.Base64.getEncoder().encodeToString((apiKey + ":X").getBytes());
+    }
+    
+    private Request.Builder applyHeaders(Request.Builder builder) {
+        builder.header("Authorization", basicAuth);
+        if (useCsrf && csrfToken != null) {
+            builder.header("X-CSRF-Token", csrfToken);
+        }
+        builder.header("Content-Type", "application/json");
+        return builder;
+    }
+
+    private String normalizePath(String path) {
+        if (path == null || path.isEmpty()) {
+            return "/";
+        }
+        return path.startsWith("/") ? path : "/" + path;
     }
 }

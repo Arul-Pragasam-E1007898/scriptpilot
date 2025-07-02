@@ -1,14 +1,20 @@
 package com.freshworks.ex;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.freshworks.ex.proxy.AgentProxy;
 import com.freshworks.ex.proxy.ContactProxy;
+import com.freshworks.ex.proxy.DepartmentProxy;
+import com.freshworks.ex.proxy.RequesterProxy;
+import com.freshworks.ex.proxy.Workspaces;
 import com.freshworks.ex.scenarios.Testcase;
 import com.freshworks.ex.scenarios.TestcaseRepository;
 import com.freshworks.ex.utils.SystemPromptLoader;
+
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.cloudverse.CloudVerseModel;
 import dev.langchain4j.service.AiServices;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ScriptPilot {
     private static final Logger logger = LoggerFactory.getLogger(ScriptPilot.class);
@@ -35,7 +41,10 @@ public class ScriptPilot {
     private static Assistant init() {
         // Initialize the contact service
         ContactProxy contactProxy = new ContactProxy("freshworks299");
-
+		DepartmentProxy departmentProxy = new DepartmentProxy("obkinfocity17090631");
+		RequesterProxy requesterProxy = new RequesterProxy("obkinfocity17090631");
+		Workspaces workspaces = new Workspaces("obkinfocity17090631", "fs.test12@gmail.com", "freshservice321");
+		AgentProxy agentProxy = new AgentProxy("obkinfocity17090631");
         // Create the chat model (replace with your OpenAI API key)
         ChatModel chatModel = CloudVerseModel.builder()
                 .baseUrl("https://cloudverse.freshworkscorp.com/api/v2")
@@ -49,7 +58,7 @@ public class ScriptPilot {
         // Create the assistant with function calling capability and chat memory
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
-                .tools(contactProxy)
+                .tools(contactProxy, departmentProxy, requesterProxy, workspaces, agentProxy)
                 .systemMessageProvider(chatMemoryId -> SYSTEM_PROMPT)
                 .build();
         logger.info("Assistant service initialized successfully");
