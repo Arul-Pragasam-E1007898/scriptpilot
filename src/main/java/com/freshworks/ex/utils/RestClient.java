@@ -36,7 +36,7 @@ public class RestClient {
      * @param domain The Freshservice domain (e.g., "freshworks299")
      */
     public RestClient(String domain) {
-        this.baseUrl = "https://" + domain + ".freshservice.com/api/v2";
+        this.baseUrl = "https://" + domain + ".freshcmdb.com/api/v2";
         this.apiKey = System.getenv("FS_API_KEY");
         this.client = new OkHttpClient();
         logger.debug("Initialized RestClient with baseUrl: {}", baseUrl);
