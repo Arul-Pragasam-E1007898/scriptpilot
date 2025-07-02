@@ -1,10 +1,19 @@
 package com.freshworks.ex.utils;
 
-import okhttp3.*;
+import java.io.IOException;
+import java.util.Base64;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * HTTP client for making REST API calls to Freshservice.
@@ -29,6 +38,11 @@ public class RestClient {
     
     /** OkHttp client instance for making HTTP requests */
     private final OkHttpClient client;
+    
+    private static RestClient privateClient;
+    private String basicAuth;
+    private String csrfToken;
+    private boolean useCsrf = false;
 
     /**
      * Constructs a new RestClient instance for a specific Freshservice domain.
@@ -40,6 +54,49 @@ public class RestClient {
         this.apiKey = System.getenv("FS_API_KEY");
         this.client = new OkHttpClient();
         logger.debug("Initialized RestClient with baseUrl: {}", baseUrl);
+    }
+    
+    public static synchronized RestClient getPrivateClient(String domain, String email, String password) {
+        if (privateClient == null) {
+            privateClient = new RestClient("https://" + domain + ".freshcmdb.com/api/v2");
+            privateClient.setBasicAuth(email, password);
+            privateClient.loginAndFetchCsrf();
+        }
+        return privateClient;
+    }
+
+    private void setBasicAuth(String username, String password) {
+        this.basicAuth = "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        logger.debug("Basic auth set for user: {}", username);
+    }
+
+    private void loginAndFetchCsrf() {
+        String url = baseUrl.replace("/api/v2", "") + "/api/_/bootstrap/me";
+
+        Request request = new Request.Builder()
+            .url(url)
+            .header("Authorization", basicAuth)
+            .header("Content-Type", "application/json")
+            .get()
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                String bodyStr = response.body().string();
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(bodyStr);
+                this.csrfToken = root.path("meta").path("csrf_token").asText(null);
+                if (csrfToken != null && !csrfToken.isEmpty()) {
+                    useCsrf = true;
+                } else {
+                    logger.warn("CSRF token not found in login response.");
+                }
+            } else {
+                logger.error("Login failed with status: {}", response.code());
+            }
+        } catch (IOException e) {
+            logger.error("Exception during login: {}", e.getMessage(), e);
+        }
     }
 
     /**

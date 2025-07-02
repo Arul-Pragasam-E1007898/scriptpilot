@@ -22,6 +22,12 @@ public class AbstractProxy {
         this.restClient = new RestClient(domain);
         logger.debug("AbstractProxy initialization completed");
     }
+    
+    public AbstractProxy(String domain, String email, String password) {
+        logger.debug("Initializing AbstractProxy (private) with domain: {}, user: {}", domain, email);
+        this.serializer = new Serializer();
+        this.restClient = RestClient.getPrivateClient(domain, email, password);
+    }
 
     protected JsonNode parse(Response response) throws IOException {
         Optional<ResponseBody> body = Optional.ofNullable(response.body());
