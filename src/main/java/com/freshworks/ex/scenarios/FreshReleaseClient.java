@@ -1,4 +1,4 @@
-package com.freshworks.ex.utils;
+package com.freshworks.ex.scenarios;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,15 +23,13 @@ public class FreshReleaseClient {
 	private static final OkHttpClient client = new OkHttpClient();
 	private static final Gson gson = new Gson();
 
-	private final String url;
-	private final String projectKey;
+	private final String url = "https://freshworks.freshrelease.com";
+	private final String projectKey = "FS";
 	private final String token;
 	private final String baseUrl;
 	private final Map<String, String> headers;
 
 	public FreshReleaseClient() {
-		this.url = "https://freshworks.freshrelease.com";
-		this.projectKey = "FS";
 		this.token = System.getenv("FRESHRELEASE_API_TOKEN"); // get from env variable
 		this.baseUrl = url + "/" + projectKey;
 
@@ -39,7 +37,8 @@ public class FreshReleaseClient {
 			throw new IllegalStateException("Environment variable FRESHRELEASE_API_TOKEN is not set");
 		}
 
-		this.headers = Map.of("Content-Type", "application/json", "Accept", "application/json", "Authorization",
+		this.headers = Map.of("Content-Type", "application/json",
+				"Accept", "application/json", "Authorization",
 				"Token token=" + token);
 	}
 
@@ -83,8 +82,8 @@ public class FreshReleaseClient {
 		}
 	}
 
-	public List<TestCase> fetchTestCasesWithSteps() throws IOException {
-		List<TestCase> testCases = new ArrayList<>();
+	public List<TestCase> fetch() throws IOException {
+
 		Map<String, String> queryParams = Map.of("query_hash[2][condition]", "base_tags.name",
 				"query_hash[2][operator]", "is_in", "query_hash[2][value][]", "SP_Demo");
 
@@ -96,10 +95,11 @@ public class FreshReleaseClient {
 			casesArray = response.getAsJsonArray("test_cases");
 		}
 
-		if (casesArray == null) {
-			throw new IOException("Response missing 'test_cases' array");
-		}
+		return deserialize(casesArray);
+	}
 
+	private static List<TestCase> deserialize(JsonArray casesArray) {
+		List<TestCase> testCases = new ArrayList<>();
 		for (JsonElement element : casesArray) {
 			JsonObject obj = element.getAsJsonObject();
 			String id = obj.get("id").getAsString();
@@ -113,28 +113,5 @@ public class FreshReleaseClient {
 		return testCases;
 	}
 
-	// Simple POJO class for test case
-	public static class TestCase {
-		private final String id;
-		private final String key;
-		private final String steps;
 
-		public TestCase(String id, String key, String steps) {
-			this.id = id;
-			this.key = key;
-			this.steps = steps;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public String getKey() {
-			return key;
-		}
-
-		public String getSteps() {
-			return steps;
-		}
-	}
 }

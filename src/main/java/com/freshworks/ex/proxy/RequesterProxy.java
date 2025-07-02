@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import dev.langchain4j.agent.tool.P;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class RequesterProxy extends AbstractProxy {
 	}
 
 	@Tool(name = "createRequesterOrContact")
-	public JsonNode createRequesterOrContact(String email) throws IOException {
+	public JsonNode createRequesterOrContact(@P("email address") String email) throws IOException {
 		String firstName = "Test" + UUID.randomUUID().toString().substring(0, 5);
 		String lastName = "User" + UUID.randomUUID().toString().substring(0, 3);
 		logger.info("Creating requester with email: {}", email);
