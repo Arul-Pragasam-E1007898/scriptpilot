@@ -31,4 +31,13 @@ public class AbstractProxy {
         }
         return null;
     }
+
+    protected JsonNode handleResponse(Response resp, String action) throws IOException {
+        String body = resp.body().string();
+        if (!resp.isSuccessful()) {
+            logger.warn("{} failed: {} - {}", action, resp.code(), body);
+            return serializer.parse("{\"error\": \"" + action + " failed\", \"code\": " + resp.code() + "}");
+        }
+        return serializer.parse(body);
+    }
 }
