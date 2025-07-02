@@ -3,8 +3,8 @@ package com.freshworks.ex;
 import com.freshworks.ex.proxy.AgentProxy;
 import com.freshworks.ex.proxy.DepartmentProxy;
 import com.freshworks.ex.proxy.RequesterProxy;
-import com.freshworks.ex.scenarios.FreshReleaseClient;
 import com.freshworks.ex.scenarios.TestCase;
+import com.freshworks.ex.scenarios.TestCaseLoader;
 import com.freshworks.ex.utils.SystemPromptLoader;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.cloudverse.CloudVerseModel;
@@ -30,13 +30,14 @@ public class ScriptPilot {
     public static void main(String[] args) throws IOException {
         logger.info("Starting ScriptPilot application");
 
+        TestCaseLoader testCaseLoader = new TestCaseLoader();
+        List<TestCase> testCases = testCaseLoader.fetch();
+
+        execute(testCases);
+    }
+
+    private static void execute(List<TestCase> testCases) {
         Assistant assistant = init();
-        FreshReleaseClient freshReleaseClient = new FreshReleaseClient();
-        List<TestCase> testCases = freshReleaseClient.fetch();
-        if (testCases.isEmpty()) {
-            logger.warn("No test cases found. Exiting.");
-            System.exit(0);
-        }
         for (TestCase testcase : testCases) {
             logger.info("Running testcase {}", testcase.getKey());
             String results = assistant.execute(testcase.getSteps());
