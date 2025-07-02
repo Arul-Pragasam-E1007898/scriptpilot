@@ -1,17 +1,15 @@
 package com.freshworks.ex.proxy;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import dev.langchain4j.agent.tool.Tool;
+import okhttp3.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import dev.langchain4j.agent.tool.Tool;
-import okhttp3.Response;
 
 public class DepartmentProxy extends AbstractProxy {
 	private static final Logger logger = LoggerFactory.getLogger(DepartmentProxy.class);

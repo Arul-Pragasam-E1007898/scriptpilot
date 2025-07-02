@@ -1,19 +1,16 @@
 package com.freshworks.ex.proxy;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import dev.langchain4j.agent.tool.Tool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import dev.langchain4j.agent.tool.Tool;
-import okhttp3.Response;
 
 public class AgentProxy extends AbstractProxy {
 	private static final Logger logger = LoggerFactory.getLogger(AgentProxy.class);
@@ -22,15 +19,6 @@ public class AgentProxy extends AbstractProxy {
 	public AgentProxy(String domain) {
 		super(domain);
 		logger.debug("Initialized AgentProxy with domain: {}", domain);
-	}
-
-	private JsonNode handleResponse(Response resp, String action) throws IOException {
-		String body = resp.body().string();
-		if (!resp.isSuccessful()) {
-			logger.warn("{} failed: {} - {}", action, resp.code(), body);
-			return serializer.parse("{\"error\": \"" + action + " failed\", \"code\": " + resp.code() + "}");
-		}
-		return serializer.parse(body);
 	}
 
 	@Tool(name = "createAgent")
@@ -55,14 +43,6 @@ public class AgentProxy extends AbstractProxy {
 		agent.put("time_format", "12h");
 		agent.put("time_zone", "UTC");
 		agent.put("background_information", "Created for automated testing");
-		/*agent.put("location_id", 1); // Set default valid location ID for your org
-		agent.put("department_ids", List.of(101L)); // Use valid department ID from your org
-		agent.put("belongs_to_workspace_ids", List.of(3L));
-		agent.put("workspace_ids", List.of(1L));
-		Map<String, Object> role = new HashMap<>();
-		role.put("role_id", 7L);
-		role.put("assignment_scope", "assigned_items");
-		agent.put("roles", List.of(role));*/
 
 		String jsonBody = serializer.serialize(agent);
 		logger.info("Sending create agent request with body: {}", jsonBody);
@@ -97,8 +77,7 @@ public class AgentProxy extends AbstractProxy {
 
 	@Tool(name = "updateAgent")
 	public JsonNode updateAgent(Long agentId, String firstName, String lastName, String email, String jobTitle,
-			String mobilePhoneNumber, String workPhoneNumber, Integer locationId, Integer departmentId, String language,
-			String timeZone, String timeFormat, String backgroundInfo, Map<String, Object> customFields)
+			String mobilePhoneNumber, String workPhoneNumber,  String backgroundInfo)
 			throws IOException {
 
 		logger.info("Updating agent with ID: {}", agentId);
@@ -116,20 +95,9 @@ public class AgentProxy extends AbstractProxy {
 			agent.put("mobile_phone_number", mobilePhoneNumber);
 		if (workPhoneNumber != null)
 			agent.put("work_phone_number", workPhoneNumber);
-		/*if (locationId != null)
-			agent.put("location_id", locationId);
-		if (departmentId != null)
-			agent.put("department_ids", List.of(departmentId));
-		if (language != null)
-			agent.put("language", language);
-		if (timeZone != null)
-			agent.put("time_zone", timeZone);
-		if (timeFormat != null)
-			agent.put("time_format", timeFormat);*/
+
 		if (backgroundInfo != null)
 			agent.put("background_information", backgroundInfo);
-//		if (customFields != null && !customFields.isEmpty())
-//			agent.put("custom_fields", customFields);
 
 		String jsonBody = serializer.serialize(agent);
 		logger.info("Sending update agent request with body: {}", jsonBody);
