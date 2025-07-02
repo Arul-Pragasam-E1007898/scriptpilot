@@ -93,7 +93,7 @@ public class RequesterProxy extends AbstractProxy {
 		return handleResponse(restClient.get("users/" + id + "/assignment-history"), "getRequesterAssignmentHistory");
 	}
 
-	@Tool(name = "forgetRequester")
+	@Tool(name = "forgetOrDeleteRequester")
 	public JsonNode forgetRequester(Long id) throws IOException {
 		logger.info("Forgetting requester/contact {}", id);
 		Response response = restClient.delete(REQUESTERS + "/" + id + "/forget");

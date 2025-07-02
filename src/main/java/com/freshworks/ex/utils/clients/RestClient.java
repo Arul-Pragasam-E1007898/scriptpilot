@@ -89,7 +89,7 @@ public abstract class RestClient {
         logger.debug("Preparing PUT request to path: {} with payload: {}", path, payload);
         Request request = new Request.Builder().url(baseUrl + path)
                 .addHeader(AUTHORIZATION, authorization())
-                .post(RequestBody.create(payload, JSON))
+                .put(RequestBody.create(payload, JSON))
                 .build();
         logger.debug("PUT request built with URL: {}", request.url());
         return execute(request);

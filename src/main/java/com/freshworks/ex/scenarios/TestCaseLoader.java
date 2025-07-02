@@ -1,19 +1,19 @@
 package com.freshworks.ex.scenarios;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.freshworks.ex.utils.Serializer;
-import com.freshworks.ex.utils.clients.FrClient;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
-import java.io.Serial;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.jetbrains.annotations.NotNull;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.freshworks.ex.utils.Serializer;
+import com.freshworks.ex.utils.clients.FrClient;
+
+import okhttp3.Response;
 
 public class TestCaseLoader {
 

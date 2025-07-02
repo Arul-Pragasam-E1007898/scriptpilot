@@ -1,19 +1,22 @@
 package com.freshworks.ex;
 
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.freshworks.ex.proxy.AgentProxy;
 import com.freshworks.ex.proxy.DepartmentProxy;
 import com.freshworks.ex.proxy.RequesterProxy;
 import com.freshworks.ex.scenarios.TestCase;
 import com.freshworks.ex.scenarios.TestCaseLoader;
 import com.freshworks.ex.utils.SystemPromptLoader;
+
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.cloudverse.CloudVerseModel;
 import dev.langchain4j.service.AiServices;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.List;
 
 public class ScriptPilot {
     private static final Logger logger = LoggerFactory.getLogger(ScriptPilot.class);
@@ -32,6 +35,7 @@ public class ScriptPilot {
 
         TestCaseLoader testCaseLoader = new TestCaseLoader();
         List<TestCase> testCases = testCaseLoader.fetch();
+        testCases.sort(Comparator.comparing(TestCase::getKey));
 
         execute(testCases);
     }
@@ -39,9 +43,21 @@ public class ScriptPilot {
     private static void execute(List<TestCase> testCases) {
         Assistant assistant = init();
         for (TestCase testcase : testCases) {
-            logger.info("Running testcase {}", testcase.getKey());
+        	logger.info("\u001B[34mRunning testcase {}\u001B[0m", testcase.getKey());
             String results = assistant.execute(testcase.getSteps());
-            System.out.println("Testcase : " + testcase.getKey() + ": " + results);
+            String RED = "\u001B[31m";
+            String GREEN = "\u001B[32m";
+            String RESET = "\u001B[0m";
+            if (results.contains("TESTCASE_STATUS: FAILED")) {
+                System.out.println(RED + "TESTCASE_STATUS: FAILED" + RESET);
+            } else if (results.contains("TESTCASE_STATUS: PASSED")) {
+                System.out.println(GREEN + "TESTCASE_STATUS: PASSED" + RESET);
+            }
+            try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
         }
     }
 
