@@ -1,6 +1,7 @@
 package com.freshworks.ex.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class AgentProxy extends AbstractProxy {
 	}
 
 	@Tool(name = "createAgent")
-	public JsonNode createAgent(String email) throws IOException {
+	public JsonNode createAgent(@P("email address") String email) throws IOException {
 		if (email == null || email.isBlank()) {
 			throw new IllegalArgumentException("Email is required to create an agent.");
 		}

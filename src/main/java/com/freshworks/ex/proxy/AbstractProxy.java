@@ -1,7 +1,8 @@
 package com.freshworks.ex.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.freshworks.ex.utils.RestClient;
+import com.freshworks.ex.utils.clients.FsClient;
+import com.freshworks.ex.utils.clients.RestClient;
 import com.freshworks.ex.utils.Serializer;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -19,7 +20,7 @@ public class AbstractProxy {
     public AbstractProxy(String domain) {
         logger.debug("Initializing AbstractProxy with domain: {}", domain);
         this.serializer = new Serializer();
-        this.restClient = new RestClient(domain);
+        this.restClient = new FsClient(domain);
         logger.debug("AbstractProxy initialization completed");
     }
 

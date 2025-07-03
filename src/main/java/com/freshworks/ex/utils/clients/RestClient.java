@@ -1,4 +1,4 @@
-package com.freshworks.ex.utils;
+package com.freshworks.ex.utils.clients;
 
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ import java.io.IOException;
  * to the Freshservice API with proper authentication and JSON handling.
  * It uses OkHttp as the underlying HTTP client library.
  */
-public class RestClient {
+public abstract class RestClient {
     private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
     
     /** HTTP header name for authorization */
@@ -25,7 +25,7 @@ public class RestClient {
     private final String baseUrl;
     
     /** API key for authentication */
-    private final String apiKey;
+    protected final String apiKey;
     
     /** OkHttp client instance for making HTTP requests */
     private final OkHttpClient client;
@@ -33,11 +33,11 @@ public class RestClient {
     /**
      * Constructs a new RestClient instance for a specific Freshservice domain.
      * 
-     * @param domain The Freshservice domain (e.g., "freshworks299")
+     * @param baseUrl The Freshservice domain (e.g., "freshworks299")
      */
-    public RestClient(String domain) {
-        this.baseUrl = "https://" + domain + ".freshcmdb.com/api/v2";
-        this.apiKey = System.getenv("FS_API_KEY");
+    public RestClient(String baseUrl, String apiKey) {
+        this.baseUrl = baseUrl;
+        this.apiKey = apiKey;
         this.client = new OkHttpClient();
         logger.debug("Initialized RestClient with baseUrl: {}", baseUrl);
     }
@@ -53,6 +53,7 @@ public class RestClient {
         logger.debug("Preparing GET request to path: {}", path);
         Request request = new Request.Builder().url(baseUrl + path)
                 .addHeader(AUTHORIZATION, authorization()).get()
+                .addHeader("accept", "application/json")
                 .build();
         logger.debug("GET request built with URL: {}", request.url());
         return execute(request);
@@ -88,7 +89,7 @@ public class RestClient {
         logger.debug("Preparing PUT request to path: {} with payload: {}", path, payload);
         Request request = new Request.Builder().url(baseUrl + path)
                 .addHeader(AUTHORIZATION, authorization())
-                .post(RequestBody.create(payload, JSON))
+                .put(RequestBody.create(payload, JSON))
                 .build();
         logger.debug("PUT request built with URL: {}", request.url());
         return execute(request);
@@ -126,14 +127,5 @@ public class RestClient {
         return response;
     }
 
-    /**
-     * Generates the Basic Authentication header value using the API key.
-     * The API key is combined with ":X" and Base64 encoded as per Freshservice's requirements.
-     * 
-     * @return The Basic Authentication header value
-     */
-    private String authorization() {
-        logger.debug("Generating authorization header");
-        return "Basic " + java.util.Base64.getEncoder().encodeToString((apiKey + ":X").getBytes());
-    }
+    protected abstract String authorization();
 }
