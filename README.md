@@ -98,3 +98,45 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Screenshot
 ![image](https://github.com/user-attachments/assets/c7eb8379-d61c-412e-8cac-af7fdd047a36)
+
+## Execution Log
+```
+================================================================================
+TEST CASE EXECUTION LOG
+================================================================================
+Test Case: TC-61757131
+Test ID: 1122375
+Execution Time: 2025-07-03 12:47:58
+Duration: 11 seconds
+================================================================================
+TEST STEPS:
+
+Create a requester with a valid email address.
+
+Verify that the returned requester has a valid (non-null) requester ID.
+Confirm that the email in the returned requester matches the email used for creation.
+
+
+
+Delete the requester created in the previous step.
+Verify that the deletion is successful.
+
+================================================================================
+EXECUTION RESULTS:
+
+TESTCASE_STATUS: FAILED
+EXECUTION_SUMMARY: The test case failed at the very first step due to an error in creating the requester, making it impossible to proceed with deletion.
+
+STEPS_EXECUTED:
+Step 1: Create a requester with a valid email address. - STATUS: FAILED - RESULT: Error: createRequesterOrContact failed (code 503). Retried once, but the error persisted.
+Step 1a: Verify that the returned requester has a valid (non-null) requester ID. - STATUS: FAILED - RESULT: Not executed due to requester creation failure.
+Step 1b: Confirm that the email in the returned requester matches the email used for creation. - STATUS: FAILED - RESULT: Not executed due to requester creation failure.
+Step 2: Delete the requester created in the previous step. - STATUS: FAILED - RESULT: Not executed because requester was not created.
+
+GENERATED_DATA: 
+- Email: testuser_20250703_124750@yopmail.com
+
+FINAL_RESULT: The test case could not be completed because the requester creation API failed with a 503 error, even after retrying. As a result, no requester was created, and subsequent verification and deletion steps could not be performed. Please investigate the requester creation service for availability or configuration issues before re-running this test.
+================================================================================
+
+```
