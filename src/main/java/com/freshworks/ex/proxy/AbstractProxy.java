@@ -26,7 +26,7 @@ public class AbstractProxy {
 
     protected JsonNode parse(Response response) throws IOException {
         Optional<ResponseBody> body = Optional.ofNullable(response.body());
-        if(body.isPresent()) {
+        if (body.isPresent()) {
             String jsonStr = body.get().string();
             return serializer.parse(jsonStr);
         }

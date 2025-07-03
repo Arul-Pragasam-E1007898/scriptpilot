@@ -42,24 +42,36 @@ public class ScriptLogger {
         writer.write("=".repeat(80) + "\n");
         writer.write("TEST CASE EXECUTION LOG\n");
         writer.write("=".repeat(80) + "\n");
-        writer.write(String.format("Test Case: %s\n", testcase.getKey()));
-        writer.write(String.format("Test ID: %s\n", testcase.getId()));
-        writer.write(String.format("Execution Time: %s\n", timestamp));
-        writer.write(String.format("Duration: %d seconds\n", duration));
+        writeSummary(testcase, duration, writer, timestamp);
         writer.write("=".repeat(80) + "\n");
-        writer.write("TEST STEPS:\n\n");
-        writer.write(steps + "\n");
-        writer.write("\n");
+        writeSteps(writer, steps);
         writer.write("=".repeat(80) + "\n");
+        writeResults(results, writer);
+    }
+
+    private static void writeResults(String results, FileWriter writer) throws IOException {
         writer.write("EXECUTION RESULTS:\n\n");
         writer.write(results.replace("```", "") + "\n");
         writer.write("=".repeat(80) + "\n");
     }
 
+    private static void writeSteps(FileWriter writer, String steps) throws IOException {
+        writer.write("TEST STEPS:\n\n");
+        writer.write(steps + "\n");
+        writer.write("\n");
+    }
+
+    private static void writeSummary(TestCase testcase, long duration, FileWriter writer, String timestamp) throws IOException {
+        writer.write(String.format("Test Case: %s\n", testcase.getKey()));
+        writer.write(String.format("Test ID: %s\n", testcase.getId()));
+        writer.write(String.format("Execution Time: %s\n", timestamp));
+        writer.write(String.format("Duration: %d seconds\n", duration));
+    }
+
     /**
      * Sanitizes HTML tags from the input string by replacing them with empty strings.
      * This method removes all HTML tags while preserving the text content.
-     * 
+     *
      * @param html The HTML string to sanitize
      * @return The sanitized string with HTML tags removed
      */
@@ -67,10 +79,10 @@ public class ScriptLogger {
         if (html == null) {
             return "";
         }
-        
+
         // Remove all HTML tags using regex
         String sanitized = html.replaceAll("<[^>]*>", "");
-        
+
         return sanitized.trim();
     }
 

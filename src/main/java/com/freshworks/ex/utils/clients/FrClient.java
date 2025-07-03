@@ -3,7 +3,7 @@ package com.freshworks.ex.utils.clients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FrClient extends RestClient{
+public class FrClient extends RestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FrClient.class);
 
@@ -11,7 +11,6 @@ public class FrClient extends RestClient{
 
     /**
      * Constructs a new RestClient instance for a specific Freshrelease domain.
-     *
      */
     public FrClient() {
         super(domain, System.getenv("FR_API_KEY"));
