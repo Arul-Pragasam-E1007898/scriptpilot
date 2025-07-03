@@ -3,7 +3,7 @@ package com.freshworks.ex.utils.clients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FsClient extends RestClient{
+public class FsClient extends RestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FsClient.class);
 

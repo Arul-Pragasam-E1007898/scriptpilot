@@ -69,9 +69,9 @@ public class Requester {
      * Creates a Requester with basic required information.
      * This factory method provides a convenient way to create a Requester with minimal required fields.
      *
-     * @param firstName The first name of the requester
-     * @param primaryEmail The primary email address
-     * @param workPhoneNumber The work phone number
+     * @param firstName         The first name of the requester
+     * @param primaryEmail      The primary email address
+     * @param workPhoneNumber   The work phone number
      * @param mobilePhoneNumber The mobile phone number
      * @return A new Requester instance with default values for optional fields
      */
@@ -88,15 +88,15 @@ public class Requester {
      * Creates a Requester with basic information including name and contact details.
      * This factory method is useful when you have both first and last names.
      *
-     * @param firstName The first name of the requester
-     * @param lastName The last name of the requester
-     * @param primaryEmail The primary email address
-     * @param workPhoneNumber The work phone number
+     * @param firstName         The first name of the requester
+     * @param lastName          The last name of the requester
+     * @param primaryEmail      The primary email address
+     * @param workPhoneNumber   The work phone number
      * @param mobilePhoneNumber The mobile phone number
      * @return A new Requester instance with default values for other optional fields
      */
-    public static Requester withName(String firstName, String lastName, String primaryEmail, 
-            Long workPhoneNumber, Long mobilePhoneNumber) {
+    public static Requester withName(String firstName, String lastName, String primaryEmail,
+                                     Long workPhoneNumber, Long mobilePhoneNumber) {
         return Requester.builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -110,17 +110,17 @@ public class Requester {
      * Creates a Requester with professional information.
      * This factory method is useful for creating a requester with job title and department information.
      *
-     * @param firstName The first name of the requester
-     * @param lastName The last name of the requester
-     * @param jobTitle The job title
-     * @param primaryEmail The primary email address
-     * @param workPhoneNumber The work phone number
+     * @param firstName         The first name of the requester
+     * @param lastName          The last name of the requester
+     * @param jobTitle          The job title
+     * @param primaryEmail      The primary email address
+     * @param workPhoneNumber   The work phone number
      * @param mobilePhoneNumber The mobile phone number
-     * @param departmentIds List of department IDs the requester belongs to
+     * @param departmentIds     List of department IDs the requester belongs to
      * @return A new Requester instance with professional information
      */
     public static Requester withProfessionalInfo(String firstName, String lastName, String jobTitle,
-            String primaryEmail, Long workPhoneNumber, Long mobilePhoneNumber, List<Long> departmentIds) {
+                                                 String primaryEmail, Long workPhoneNumber, Long mobilePhoneNumber, List<Long> departmentIds) {
         return Requester.builder()
                 .firstName(firstName)
                 .lastName(lastName)

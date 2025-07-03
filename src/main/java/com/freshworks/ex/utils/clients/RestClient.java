@@ -14,25 +14,35 @@ import java.io.IOException;
  */
 public abstract class RestClient {
     private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
-    
-    /** HTTP header name for authorization */
+
+    /**
+     * HTTP header name for authorization
+     */
     private static final String AUTHORIZATION = "Authorization";
-    
-    /** Media type for JSON content */
+
+    /**
+     * Media type for JSON content
+     */
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    /** Base URL for the Freshservice API */
+    /**
+     * Base URL for the Freshservice API
+     */
     private final String baseUrl;
-    
-    /** API key for authentication */
+
+    /**
+     * API key for authentication
+     */
     protected final String apiKey;
-    
-    /** OkHttp client instance for making HTTP requests */
+
+    /**
+     * OkHttp client instance for making HTTP requests
+     */
     private final OkHttpClient client;
 
     /**
      * Constructs a new RestClient instance for a specific Freshservice domain.
-     * 
+     *
      * @param baseUrl The Freshservice domain (e.g., "freshworks299")
      */
     public RestClient(String baseUrl, String apiKey) {
@@ -44,7 +54,7 @@ public abstract class RestClient {
 
     /**
      * Performs a GET request to the specified path.
-     * 
+     *
      * @param path The API endpoint path to request
      * @return Response object containing the server's response
      * @throws IOException if the request fails or cannot be executed
@@ -61,8 +71,8 @@ public abstract class RestClient {
 
     /**
      * Performs a POST request to the specified path with a JSON payload.
-     * 
-     * @param path The API endpoint path to request
+     *
+     * @param path    The API endpoint path to request
      * @param payload The JSON string to send in the request body
      * @return Response object containing the server's response
      * @throws IOException if the request fails or cannot be executed
@@ -79,8 +89,8 @@ public abstract class RestClient {
 
     /**
      * Performs a PUT request to the specified path with a JSON payload.
-     * 
-     * @param path The API endpoint path to request
+     *
+     * @param path    The API endpoint path to request
      * @param payload The JSON string to send in the request body
      * @return Response object containing the server's response
      * @throws IOException if the request fails or cannot be executed
@@ -97,7 +107,7 @@ public abstract class RestClient {
 
     /**
      * Performs a DELETE request to the specified path.
-     * 
+     *
      * @param path The API endpoint path to request
      * @return Response object containing the server's response
      * @throws IOException if the request fails or cannot be executed
@@ -114,7 +124,7 @@ public abstract class RestClient {
     /**
      * Executes an HTTP request and returns the response.
      * This method is used internally by all HTTP method-specific methods.
-     * 
+     *
      * @param request The HTTP request to execute
      * @return Response object containing the server's response
      * @throws IOException if the request fails or cannot be executed
@@ -122,8 +132,8 @@ public abstract class RestClient {
     public Response execute(Request request) throws IOException {
         logger.debug("Executing {} request to: {}", request.method(), request.url());
         Response response = client.newCall(request).execute();
-        logger.debug("Received response with status code: {} for {} request to: {}", 
-            response.code(), request.method(), request.url());
+        logger.debug("Received response with status code: {} for {} request to: {}",
+                response.code(), request.method(), request.url());
         return response;
     }
 

@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * using Jackson's ObjectMapper.
  */
 public class Serializer {
-    /** Jackson ObjectMapper instance for JSON processing */
+    /**
+     * Jackson ObjectMapper instance for JSON processing
+     */
     private final ObjectMapper objectMapper;
 
     /**
@@ -23,7 +25,7 @@ public class Serializer {
 
     /**
      * Parses a JSON string into a JsonNode object.
-     * 
+     *
      * @param json The JSON string to parse
      * @return JsonNode representing the parsed JSON structure
      * @throws JsonProcessingException if the JSON string is malformed or cannot be parsed
@@ -34,7 +36,7 @@ public class Serializer {
 
     /**
      * Serializes a Java object into a JSON string.
-     * 
+     *
      * @param value The object to serialize
      * @return JSON string representation of the object
      * @throws JsonProcessingException if the object cannot be serialized to JSON

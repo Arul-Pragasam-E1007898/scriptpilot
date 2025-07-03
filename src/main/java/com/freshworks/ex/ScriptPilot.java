@@ -24,7 +24,7 @@ public class ScriptPilot {
         testCases.sort(Comparator.comparing(TestCase::getKey));
 
         runner.execute(testCases);
-        
+
         // Generate HTML report after all test cases are executed
         HtmlReportGenerator.generateReport(testCases);
     }

@@ -54,14 +54,14 @@ public class ScriptRunner {
         long end = System.currentTimeMillis();
 
         // Log execution results to file
-        scriptLogger.log(testcase, results, (end-start)/1000);
+        scriptLogger.log(testcase, results, (end - start) / 1000);
 
-        log(testcase, results.contains("TESTCASE_STATUS: PASSED"), end-start);
+        log(testcase, results.contains("TESTCASE_STATUS: PASSED"), end - start);
     }
 
     private void log(TestCase tc, boolean status, long elapsed) {
         tc.setStatus(status);
-        tc.setDuration(elapsed/1000);
+        tc.setDuration(elapsed / 1000);
         if (status) {
             System.out.println(GREEN + "Execution Status: ✅" + RESET);
         } else {
