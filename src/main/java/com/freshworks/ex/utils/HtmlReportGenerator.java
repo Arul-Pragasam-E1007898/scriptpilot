@@ -171,6 +171,7 @@ public class HtmlReportGenerator {
                         padding: 15px;
                         text-align: left;
                         border-bottom: 1px solid #eee;
+                        vertical-align: top;
                     }
                     
                     th {
@@ -202,11 +203,90 @@ public class HtmlReportGenerator {
                     }
                     
                     .steps-cell {
-                        max-width: 400px;
+                        max-width: 500px;
                         word-wrap: break-word;
-                        white-space: pre-wrap;
                         font-size: 0.9rem;
                         line-height: 1.4;
+                    }
+                    
+                    .steps-content {
+                        position: relative;
+                    }
+                    
+                    .steps-preview {
+                        max-height: 4.2em; /* Approximately 3 lines */
+                        overflow: hidden;
+                        position: relative;
+                    }
+                    
+                    .steps-preview::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        height: 1.4em;
+                        background: linear-gradient(transparent, white);
+                    }
+                    
+                    .steps-full {
+                        display: none;
+                    }
+                    
+                    .steps-toggle {
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 0.8rem;
+                        cursor: pointer;
+                        margin-top: 8px;
+                        transition: background-color 0.2s;
+                    }
+                    
+                    .steps-toggle:hover {
+                        background: #0056b3;
+                    }
+                    
+                    .steps-content p {
+                        margin: 0.5em 0;
+                    }
+                    
+                    .steps-content ul, .steps-content ol {
+                        margin: 0.5em 0;
+                        padding-left: 1.5em;
+                    }
+                    
+                    .steps-content li {
+                        margin: 0.3em 0;
+                    }
+                    
+                    .steps-content code {
+                        background: #f1f3f4;
+                        padding: 2px 4px;
+                        border-radius: 3px;
+                        font-family: 'Courier New', monospace;
+                        font-size: 0.85em;
+                    }
+                    
+                    .steps-content strong {
+                        font-weight: 600;
+                    }
+                    
+                    .test-key-link {
+                        color: #007bff;
+                        text-decoration: none;
+                        transition: color 0.2s;
+                    }
+                    
+                    .test-key-link:hover {
+                        color: #0056b3;
+                        text-decoration: underline;
+                    }
+                    
+                    .test-key-link:visited {
+                        color: #6f42c1;
                     }
                     
                     .footer {
@@ -232,6 +312,10 @@ public class HtmlReportGenerator {
                         
                         th, td {
                             padding: 10px;
+                        }
+                        
+                        .steps-cell {
+                            max-width: 300px;
                         }
                     }
                 </style>
@@ -288,7 +372,7 @@ public class HtmlReportGenerator {
                     <table>
                         <thead>
                             <tr>
-                                <th>Test ID</th>
+                                <th>#</th>
                                 <th>Test Key</th>
                                 <th>Status</th>
                                 <th>Duration (s)</th>
@@ -298,26 +382,41 @@ public class HtmlReportGenerator {
                         <tbody>
             """);
         
-        for (TestCase testCase : testCases) {
+        for (int i = 0; i < testCases.size(); i++) {
+            TestCase testCase = testCases.get(i);
             String statusClass = testCase.getStatus() ? "status-passed" : "status-failed";
             String statusText = testCase.getStatus() ? "✅ Passed" : "❌ Failed";
-            String steps = escapeHtml(testCase.getSteps());
+            String steps = testCase.getSteps(); // Keep HTML content as is
+            String testKeyUrl = "https://freshworks.freshrelease.com/ws/FS/test-cases/" + testCase.getKey();
             
             table.append(String.format("""
                 <tr>
-                    <td>%s</td>
-                    <td><strong>%s</strong></td>
+                    <td>%d</td>
+                    <td><a href="%s" target="_blank" class="test-key-link"><strong>%s</strong></a></td>
                     <td><span class="status-badge %s">%s</span></td>
                     <td>%d</td>
-                    <td class="steps-cell">%s</td>
+                    <td class="steps-cell">
+                        <div class="steps-content">
+                            <div class="steps-preview" id="preview-%d">
+                                %s
+                            </div>
+                            <div class="steps-full" id="full-%d">
+                                %s
+                            </div>
+                            <button class="steps-toggle" onclick="toggleSteps(%d)">Show More</button>
+                        </div>
+                    </td>
                 </tr>
                 """, 
-                escapeHtml(testCase.getId()),
+                i + 1, // Sequence number starting from 1
+                testKeyUrl,
                 escapeHtml(testCase.getKey()),
                 statusClass,
                 statusText,
                 testCase.getDuration(),
-                steps));
+                i, steps,
+                i, steps,
+                i));
         }
         
         table.append("""
@@ -336,6 +435,32 @@ public class HtmlReportGenerator {
                 <p>Generated by ScriptPilot Test Automation Framework</p>
             </div>
         </div>
+        
+        <script>
+            function toggleSteps(index) {
+                const preview = document.getElementById('preview-' + index);
+                const full = document.getElementById('full-' + index);
+                const button = preview.parentElement.querySelector('.steps-toggle');
+                
+                if (full.style.display === 'none' || full.style.display === '') {
+                    preview.style.display = 'none';
+                    full.style.display = 'block';
+                    button.textContent = 'Show Less';
+                } else {
+                    preview.style.display = 'block';
+                    full.style.display = 'none';
+                    button.textContent = 'Show More';
+                }
+            }
+            
+            // Initialize all steps as collapsed
+            document.addEventListener('DOMContentLoaded', function() {
+                const allFull = document.querySelectorAll('.steps-full');
+                allFull.forEach(function(element) {
+                    element.style.display = 'none';
+                });
+            });
+        </script>
     </body>
     </html>
     """;
