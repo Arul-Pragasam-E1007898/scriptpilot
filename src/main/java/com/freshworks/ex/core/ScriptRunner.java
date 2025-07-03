@@ -2,13 +2,10 @@ package com.freshworks.ex.core;
 
 import java.util.List;
 
+import com.freshworks.ex.proxy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.freshworks.ex.proxy.AgentProxy;
-import com.freshworks.ex.proxy.DepartmentProxy;
-import com.freshworks.ex.proxy.EmailTool;
-import com.freshworks.ex.proxy.RequesterProxy;
 import com.freshworks.ex.scenarios.TestCase;
 import com.freshworks.ex.utils.SystemPromptLoader;
 
@@ -18,6 +15,8 @@ import dev.langchain4j.service.AiServices;
 
 public class ScriptRunner {
     private static final String domain = System.getenv("FS_DOMAIN");
+    private static final String email = System.getenv("EMAIL");
+    private static final String password = System.getenv("PASSWORD");
 
     // Load system prompt
     private static final String SYSTEM_PROMPT = SystemPromptLoader.loadSystemPrompt();
@@ -74,7 +73,8 @@ public class ScriptRunner {
         DepartmentProxy departmentProxy = new DepartmentProxy(domain);
         RequesterProxy requesterProxy = new RequesterProxy(domain);
         AgentProxy agentProxy = new AgentProxy(domain);
-        EmailTool email = new EmailTool();
+        EmailTool emailProxy = new EmailTool();
+        WorkspacesProxy workspacesProxy = new WorkspacesProxy(domain, email, password);
 
 
         logger.debug("Initialized chat model");
@@ -82,7 +82,7 @@ public class ScriptRunner {
         // Create the assistant with function calling capability and chat memory
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
-                .tools(departmentProxy, requesterProxy, agentProxy, email)
+                .tools(departmentProxy, requesterProxy, agentProxy, emailProxy, workspacesProxy)
                 .systemMessageProvider(chatMemoryId -> SYSTEM_PROMPT)
                 .build();
         logger.info("Assistant service initialized successfully");
