@@ -1,24 +1,26 @@
 package com.freshworks.ex.core;
 
-import com.freshworks.ex.proxy.AgentProxy;
-import com.freshworks.ex.proxy.DepartmentProxy;
-import com.freshworks.ex.proxy.RequesterProxy;
-import com.freshworks.ex.scenarios.TestCase;
-import com.freshworks.ex.utils.SystemPromptLoader;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.cloudverse.CloudVerseModel;
-import dev.langchain4j.service.AiServices;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import com.freshworks.ex.proxy.AgentProxy;
+import com.freshworks.ex.proxy.DepartmentProxy;
+import com.freshworks.ex.proxy.EmailTool;
+import com.freshworks.ex.proxy.RequesterProxy;
+import com.freshworks.ex.scenarios.TestCase;
+import com.freshworks.ex.utils.SystemPromptLoader;
+
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.cloudverse.CloudVerseModel;
+import dev.langchain4j.service.AiServices;
 
 public class ScriptRunner {
     private static final String domain = System.getenv("FS_DOMAIN");
 
     // Load system prompt
     private static final String SYSTEM_PROMPT = SystemPromptLoader.loadSystemPrompt();
-    private static final int INTERVAL = 2000;
     private static final String RED = "\u001B[31m";
     private static final String GREEN = "\u001B[32m";
     private static final String RESET = "\u001B[0m";
@@ -55,15 +57,6 @@ public class ScriptRunner {
         scriptLogger.log(testcase, results, (end-start)/1000);
 
         log(testcase, results.contains("TESTCASE_STATUS: PASSED"), end-start);
-        sleep();
-    }
-
-    private void sleep() {
-        try {
-            Thread.sleep(INTERVAL);
-        } catch (InterruptedException e) {
-            //suppress
-        }
     }
 
     private void log(TestCase tc, boolean status, long elapsed) {
@@ -81,6 +74,7 @@ public class ScriptRunner {
         DepartmentProxy departmentProxy = new DepartmentProxy(domain);
         RequesterProxy requesterProxy = new RequesterProxy(domain);
         AgentProxy agentProxy = new AgentProxy(domain);
+        EmailTool email = new EmailTool();
 
 
         logger.debug("Initialized chat model");
@@ -88,7 +82,7 @@ public class ScriptRunner {
         // Create the assistant with function calling capability and chat memory
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
-                .tools(departmentProxy, requesterProxy, agentProxy)
+                .tools(departmentProxy, requesterProxy, agentProxy, email)
                 .systemMessageProvider(chatMemoryId -> SYSTEM_PROMPT)
                 .build();
         logger.info("Assistant service initialized successfully");
