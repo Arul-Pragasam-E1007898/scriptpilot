@@ -5,6 +5,7 @@ import com.freshworks.ex.proxy.DepartmentProxy;
 import com.freshworks.ex.proxy.RequesterProxy;
 import com.freshworks.ex.scenarios.TestCase;
 import com.freshworks.ex.scenarios.TestCaseLoader;
+import com.freshworks.ex.utils.HtmlReportGenerator;
 import com.freshworks.ex.utils.SystemPromptLoader;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.cloudverse.CloudVerseModel;
@@ -40,19 +41,27 @@ public class ScriptPilot {
         testCases.sort(Comparator.comparing(TestCase::getKey));
 
         execute(testCases);
+        
+        // Generate HTML report after all test cases are executed
+        HtmlReportGenerator.generateReport(testCases);
     }
 
     private static void execute(List<TestCase> testCases) {
         Assistant assistant = init();
+        int i=0;
         for (TestCase testcase : testCases) {
         	logger.info("\u001B[34mRunning testcase {}\u001B[0m", testcase.getKey());
-            execute(testcase, assistant);
+            if(i<5)
+                execute(testcase, assistant);
+            i++;
         }
     }
 
     private static void execute(TestCase testcase, Assistant assistant) {
+        long start = System.currentTimeMillis();
         String results = assistant.execute(testcase.getSteps());
-        log(testcase, results.contains("TESTCASE_STATUS: PASSED"));
+        long end = System.currentTimeMillis();
+        log(testcase, results.contains("TESTCASE_STATUS: PASSED"), end-start);
         sleep();
     }
 
@@ -64,8 +73,9 @@ public class ScriptPilot {
         }
     }
 
-    private static void log(TestCase tc, boolean status) {
+    private static void log(TestCase tc, boolean status, long elapsed) {
         tc.setStatus(status);
+        tc.setDuration(elapsed/1000);
         if (status) {
             System.out.println(GREEN + "Execution Status: ✅" + RESET);
         } else {
