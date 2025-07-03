@@ -1,6 +1,5 @@
 package com.freshworks.ex.core;
 
-import com.freshworks.ex.ScriptPilot;
 import com.freshworks.ex.scenarios.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,7 @@ public class ScriptLogger {
 
     private static void log(TestCase testcase, String results, long duration, FileWriter writer) throws IOException {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String steps = sanitizeHtml(testcase.getSteps());
 
         writer.write("=".repeat(80) + "\n");
         writer.write("TEST CASE EXECUTION LOG\n");
@@ -47,15 +47,31 @@ public class ScriptLogger {
         writer.write(String.format("Execution Time: %s\n", timestamp));
         writer.write(String.format("Duration: %d seconds\n", duration));
         writer.write("=".repeat(80) + "\n");
-        writer.write("TEST STEPS:\n");
-        writer.write("-".repeat(40) + "\n");
-        writer.write(testcase.getSteps() + "\n");
+        writer.write("TEST STEPS:\n\n");
+        writer.write(steps + "\n");
         writer.write("\n");
         writer.write("=".repeat(80) + "\n");
-        writer.write("EXECUTION RESULTS:\n");
-        writer.write("-".repeat(40) + "\n");
-        writer.write(results + "\n");
+        writer.write("EXECUTION RESULTS:\n\n");
+        writer.write(results.replace("```", "") + "\n");
         writer.write("=".repeat(80) + "\n");
+    }
+
+    /**
+     * Sanitizes HTML tags from the input string by replacing them with empty strings.
+     * This method removes all HTML tags while preserving the text content.
+     * 
+     * @param html The HTML string to sanitize
+     * @return The sanitized string with HTML tags removed
+     */
+    private static String sanitizeHtml(String html) {
+        if (html == null) {
+            return "";
+        }
+        
+        // Remove all HTML tags using regex
+        String sanitized = html.replaceAll("<[^>]*>", "");
+        
+        return sanitized.trim();
     }
 
     private void createLogsDirectory() {
