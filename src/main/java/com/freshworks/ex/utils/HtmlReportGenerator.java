@@ -337,6 +337,12 @@ public class HtmlReportGenerator {
     
     private static String buildExecutionSummary(long totalTests, long passedTests, long failedTests, 
                                                double passRate, long totalDuration) {
+        // Convert total duration from seconds to minutes
+        double totalDurationMinutes = totalDuration / 60.0;
+        String durationDisplay = totalDurationMinutes < 1.0 ? 
+            String.format("%.1fs", (double) totalDuration) : 
+            String.format("%.1fm", totalDurationMinutes);
+            
         return String.format("""
             <div class="summary">
                 <div class="summary-card">
@@ -356,11 +362,11 @@ public class HtmlReportGenerator {
                     <p>Pass Rate</p>
                 </div>
                 <div class="summary-card">
-                    <h3 class="duration">%ds</h3>
+                    <h3 class="duration">%s</h3>
                     <p>Total Duration</p>
                 </div>
             </div>
-            """, totalTests, passedTests, failedTests, passRate, totalDuration);
+            """, totalTests, passedTests, failedTests, passRate, durationDisplay);
     }
     
     private static String buildTestCaseTable(List<TestCase> testCases) {
