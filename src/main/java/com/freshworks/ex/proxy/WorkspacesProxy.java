@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.*;
 
 public class WorkspacesProxy extends AbstractProxy {
@@ -17,6 +18,23 @@ public class WorkspacesProxy extends AbstractProxy {
     public WorkspacesProxy(String domain, String email, String password) {
         super(domain, email, password);
         logger.debug("Initialized Workspaces proxy for domain: {}", domain);
+    }
+
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final SecureRandom random = new SecureRandom();
+
+    private String generateRandomString(int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for(int i = 0; i < length; i++) {
+            sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+        }
+        return sb.toString();
+    }
+
+    @Tool(name = "createOrGenerateOrRandomOrWorkspaceName")
+    public String generateRandomWorkspaceName() {
+        String randomString = generateRandomString(8);
+        return "workspace" + "_" + randomString;
     }
 
     @Tool(name = "listWorkspaces")
