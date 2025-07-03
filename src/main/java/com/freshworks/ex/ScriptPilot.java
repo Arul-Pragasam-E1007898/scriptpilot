@@ -52,7 +52,7 @@ public class ScriptPilot {
 
     private static void execute(TestCase testcase, Assistant assistant) {
         String results = assistant.execute(testcase.getSteps());
-        log(results.contains("TESTCASE_STATUS: PASSED"));
+        log(testcase, results.contains("TESTCASE_STATUS: PASSED"));
         sleep();
     }
 
@@ -64,11 +64,12 @@ public class ScriptPilot {
         }
     }
 
-    private static void log(boolean status) {
+    private static void log(TestCase tc, boolean status) {
+        tc.setStatus(status);
         if (status) {
-            System.out.println(GREEN + "TESTCASE_STATUS: PASSED" + RESET);
+            System.out.println(GREEN + "Execution Status: ✅" + RESET);
         } else {
-            System.out.println(RED + "TESTCASE_STATUS: FAILED" + RESET);
+            System.out.println(RED + "Execution Status: ❌" + RESET);
         }
     }
 

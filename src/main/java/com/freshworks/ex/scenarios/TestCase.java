@@ -5,11 +5,13 @@ public class TestCase {
     private final String id;
     private final String key;
     private final String steps;
+    private boolean status;
 
     public TestCase(String id, String key, String steps) {
         this.id = id;
         this.key = key;
         this.steps = steps;
+        this.status = false;
     }
 
     public String getId() {
@@ -22,5 +24,9 @@ public class TestCase {
 
     public String getSteps() {
         return steps;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }
