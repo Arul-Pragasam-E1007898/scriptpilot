@@ -48,12 +48,9 @@ public class ScriptPilot {
 
     private static void execute(List<TestCase> testCases) {
         Assistant assistant = init();
-        int i=0;
         for (TestCase testcase : testCases) {
         	logger.info("\u001B[34mRunning testcase {}\u001B[0m", testcase.getKey());
-            if(i<5)
-                execute(testcase, assistant);
-            i++;
+            execute(testcase, assistant);
         }
     }
 
