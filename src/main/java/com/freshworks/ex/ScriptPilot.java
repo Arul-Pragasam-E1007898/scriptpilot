@@ -1,30 +1,32 @@
 package com.freshworks.ex;
 
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.freshworks.ex.proxy.AgentProxy;
 import com.freshworks.ex.proxy.DepartmentProxy;
 import com.freshworks.ex.proxy.RequesterProxy;
 import com.freshworks.ex.scenarios.TestCase;
 import com.freshworks.ex.scenarios.TestCaseLoader;
 import com.freshworks.ex.utils.SystemPromptLoader;
-
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.cloudverse.CloudVerseModel;
 import dev.langchain4j.service.AiServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 
 public class ScriptPilot {
     private static final Logger logger = LoggerFactory.getLogger(ScriptPilot.class);
     private static final String key = System.getenv("CLOUDVERSE_TOKEN");
     private static final String domain = System.getenv("FS_DOMAIN");
 
-    // Load system prompt at class level
+    // Load system prompt
     private static final String SYSTEM_PROMPT = SystemPromptLoader.loadSystemPrompt();
+    private static final int INTERVAL = 2000;
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String RESET = "\u001B[0m";
 
     interface Assistant {
         String execute(String userMessage);
@@ -44,26 +46,34 @@ public class ScriptPilot {
         Assistant assistant = init();
         for (TestCase testcase : testCases) {
         	logger.info("\u001B[34mRunning testcase {}\u001B[0m", testcase.getKey());
-            String results = assistant.execute(testcase.getSteps());
-            String RED = "\u001B[31m";
-            String GREEN = "\u001B[32m";
-            String RESET = "\u001B[0m";
-            if (results.contains("TESTCASE_STATUS: FAILED")) {
-                System.out.println(RED + "TESTCASE_STATUS: FAILED" + RESET);
-            } else if (results.contains("TESTCASE_STATUS: PASSED")) {
-                System.out.println(GREEN + "TESTCASE_STATUS: PASSED" + RESET);
-            }
-            try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+            execute(testcase, assistant);
+        }
+    }
+
+    private static void execute(TestCase testcase, Assistant assistant) {
+        String results = assistant.execute(testcase.getSteps());
+        log(results.contains("TESTCASE_STATUS: PASSED"));
+        sleep();
+    }
+
+    private static void sleep() {
+        try {
+            Thread.sleep(INTERVAL);
+        } catch (InterruptedException e) {
+            //suppress
+        }
+    }
+
+    private static void log(boolean status) {
+        if (status) {
+            System.out.println(GREEN + "TESTCASE_STATUS: PASSED" + RESET);
+        } else {
+            System.out.println(RED + "TESTCASE_STATUS: FAILED" + RESET);
         }
     }
 
     private static Assistant init() {
-        // Initialize the contact service
-
+        // Initialize the proxies
         DepartmentProxy departmentProxy = new DepartmentProxy(domain);
         RequesterProxy requesterProxy = new RequesterProxy(domain);
         AgentProxy agentProxy = new AgentProxy(domain);
