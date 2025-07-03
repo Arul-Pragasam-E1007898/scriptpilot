@@ -6,6 +6,11 @@ import com.freshworks.ex.proxy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import com.freshworks.ex.proxy.user.AgentProxy;
+import com.freshworks.ex.proxy.user.DepartmentProxy;
+import com.freshworks.ex.proxy.EmailTool;
+import com.freshworks.ex.proxy.user.RequesterProxy;
 import com.freshworks.ex.scenarios.TestCase;
 import com.freshworks.ex.utils.SystemPromptLoader;
 

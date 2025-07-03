@@ -1,6 +1,7 @@
-package com.freshworks.ex.proxy;
+package com.freshworks.ex.proxy.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.freshworks.ex.proxy.AbstractProxy;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import org.slf4j.Logger;

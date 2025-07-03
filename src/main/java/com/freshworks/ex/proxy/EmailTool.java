@@ -10,7 +10,7 @@ public class EmailTool {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @Tool(name = "generateOrCreateOrNewOrRandomEmail")
-    public String generateYopmailEmail() {
+    public String generateEmail() {
         String timestamp = LocalDateTime.now().format(formatter);
         return "testuser_" + timestamp + "@yopmail.com";
     }

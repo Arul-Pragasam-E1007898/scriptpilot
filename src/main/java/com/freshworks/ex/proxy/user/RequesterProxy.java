@@ -1,9 +1,10 @@
-package com.freshworks.ex.proxy;
+package com.freshworks.ex.proxy.user;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.freshworks.ex.proxy.AbstractProxy;
 import dev.langchain4j.agent.tool.P;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
