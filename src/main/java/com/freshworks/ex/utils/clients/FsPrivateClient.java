@@ -59,7 +59,6 @@ public class FsPrivateClient extends RestClient {
         }
     }
 
-    @Override
     protected String authorization() {
         return basicAuth;
     }

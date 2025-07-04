@@ -30,9 +30,9 @@ public abstract class RestClient {
      */
     protected final String baseUrl;
 
-    private final String email;
+    protected final String email;
 
-    private final String password;
+    protected final String password;
 
     /**
      * API key for authentication
@@ -60,9 +60,9 @@ public abstract class RestClient {
 
     public RestClient(String baseUrl, String email, String password) {
         this.baseUrl = baseUrl;
+        this.apiKey = null;
         this.email = email;
         this.password = password;
-        this.apiKey = null;
         this.client = new OkHttpClient();
         logger.debug("Initialized Private RestClient with baseUrl: {}", baseUrl);
     }
