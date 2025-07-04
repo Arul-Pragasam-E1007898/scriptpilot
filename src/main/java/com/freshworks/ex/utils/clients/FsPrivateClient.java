@@ -22,7 +22,6 @@ public class FsPrivateClient extends RestClient {
         return "Basic " + encoded;
     }
 
-    @Override
     protected String authorization() {
         return basicAuth;
     }
