@@ -66,7 +66,7 @@ public abstract class RestClient {
         this.client = new OkHttpClient();
         logger.debug("Initialized Private RestClient with baseUrl: {}", baseUrl);
     }
-    
+
     /**
      * Performs a GET request to the specified path.
      *

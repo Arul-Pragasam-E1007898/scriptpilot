@@ -25,7 +25,7 @@ public class WorkspacesProxy extends AbstractProxy {
 
     private String generateRandomString(int length) {
         StringBuilder sb = new StringBuilder(length);
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
         return sb.toString();
