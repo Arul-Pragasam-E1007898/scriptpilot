@@ -28,7 +28,11 @@ public abstract class RestClient {
     /**
      * Base URL for the Freshservice API
      */
-    private final String baseUrl;
+    protected final String baseUrl;
+
+    protected final String email;
+
+    protected final String password;
 
     /**
      * API key for authentication
@@ -38,7 +42,7 @@ public abstract class RestClient {
     /**
      * OkHttp client instance for making HTTP requests
      */
-    private final OkHttpClient client;
+    protected final OkHttpClient client;
 
     /**
      * Constructs a new RestClient instance for a specific Freshservice domain.
@@ -48,8 +52,19 @@ public abstract class RestClient {
     public RestClient(String baseUrl, String apiKey) {
         this.baseUrl = baseUrl;
         this.apiKey = apiKey;
+        this.email = null;
+        this.password = null;
         this.client = new OkHttpClient();
         logger.debug("Initialized RestClient with baseUrl: {}", baseUrl);
+    }
+
+    public RestClient(String baseUrl, String email, String password) {
+        this.baseUrl = baseUrl;
+        this.apiKey = null;
+        this.email = email;
+        this.password = password;
+        this.client = new OkHttpClient();
+        logger.debug("Initialized Private RestClient with baseUrl: {}", baseUrl);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.freshworks.ex.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.freshworks.ex.utils.clients.FsClient;
+import com.freshworks.ex.utils.clients.FsPrivateClient;
 import com.freshworks.ex.utils.clients.RestClient;
 import com.freshworks.ex.utils.Serializer;
 import okhttp3.Response;
@@ -22,6 +23,13 @@ public class AbstractProxy {
         this.serializer = new Serializer();
         this.restClient = new FsClient(domain);
         logger.debug("AbstractProxy initialization completed");
+    }
+
+    public AbstractProxy(String domain, String email, String password) {
+        logger.debug("Initializing AbstractProxy (Private) with domain: {}, user: {}", domain, email);
+        String baseUrl = "https://" + domain + ".freshcmdb.com";
+        this.serializer = new Serializer();
+        this.restClient = new FsPrivateClient(baseUrl, email, password);
     }
 
     protected JsonNode parse(Response response) throws IOException {
