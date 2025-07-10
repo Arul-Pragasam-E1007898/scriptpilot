@@ -37,8 +37,8 @@ public class DepartmentProxy extends AbstractProxy {
 
         // Optional - add only if non-null
         if (description != null) department.put("description", description);
-        if (headUserId != null) department.put("head_user_id", headUserId.intValue());
-        if (primeUserId != null) department.put("prime_user_id", primeUserId.intValue());
+        if (headUserId != null && headUserId != 0) department.put("head_user_id", headUserId);
+        if (primeUserId != null && primeUserId != 0) department.put("prime_user_id", primeUserId);
         if (domains != null && !domains.isEmpty()) department.put("domains", domains);
         if (customFields != null && !customFields.isEmpty()) department.put("custom_fields", customFields);
 

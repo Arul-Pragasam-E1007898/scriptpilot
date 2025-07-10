@@ -3,14 +3,10 @@ package com.freshworks.ex.core;
 import java.util.List;
 
 import com.freshworks.ex.proxy.*;
+import com.freshworks.ex.proxy.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import com.freshworks.ex.proxy.user.AgentProxy;
-import com.freshworks.ex.proxy.user.DepartmentProxy;
-import com.freshworks.ex.proxy.EmailTool;
-import com.freshworks.ex.proxy.user.RequesterProxy;
 import com.freshworks.ex.scenarios.TestCase;
 import com.freshworks.ex.utils.SystemPromptLoader;
 
@@ -80,14 +76,14 @@ public class ScriptRunner {
         AgentProxy agentProxy = new AgentProxy(domain);
         EmailTool emailProxy = new EmailTool();
         WorkspacesProxy workspacesProxy = new WorkspacesProxy(domain, email, password);
-
+        TicketProxy ticketProxy = new TicketProxy(domain);
 
         logger.debug("Initialized chat model");
 
         // Create the assistant with function calling capability and chat memory
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
-                .tools(departmentProxy, requesterProxy, agentProxy, emailProxy, workspacesProxy)
+                .tools(departmentProxy, requesterProxy, agentProxy, emailProxy, workspacesProxy, ticketProxy)
                 .systemMessageProvider(chatMemoryId -> SYSTEM_PROMPT)
                 .build();
         logger.info("Assistant service initialized successfully");
