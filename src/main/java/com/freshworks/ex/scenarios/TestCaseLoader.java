@@ -23,7 +23,7 @@ public class TestCaseLoader {
     private static final Map<String, String> queryParams = Map.of(
             "query_hash[2][condition]", "base_tags.name",
             "query_hash[2][operator]", "is_in",
-            "query_hash[2][value][]", "SP_Demo",
+            "query_hash[2][value][]", "SP_Demo",//SP_Demo
             "per_page", "250",
             "page", "1",
             "include", "custom_field,test_case");
