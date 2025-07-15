@@ -48,7 +48,7 @@ public class HtmlReportGenerator {
 
         // Calculate statistics
         long totalTests = testCases.size();
-        long passedTests = testCases.stream().mapToLong(tc -> tc.getStatus() ? 1 : 0).sum();
+        long passedTests = testCases.stream().mapToLong(tc -> tc.isStatus() ? 1 : 0).sum();
         long failedTests = totalTests - passedTests;
         double passRate = totalTests > 0 ? (double) passedTests / totalTests * 100 : 0;
         long totalDuration = testCases.stream().mapToLong(TestCase::getDuration).sum();
@@ -383,6 +383,8 @@ public class HtmlReportGenerator {
                                     <th>Status</th>
                                     <th>Duration (s)</th>
                                     <th>Steps</th>
+                                    <th>Token(input)</th>
+                                    <th>Token(output)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -390,8 +392,8 @@ public class HtmlReportGenerator {
 
         for (int i = 0; i < testCases.size(); i++) {
             TestCase testCase = testCases.get(i);
-            String statusClass = testCase.getStatus() ? "status-passed" : "status-failed";
-            String statusText = testCase.getStatus() ? "✅ Passed" : "❌ Failed";
+            String statusClass = testCase.isStatus() ? "status-passed" : "status-failed";
+            String statusText = testCase.isStatus() ? "✅ Passed" : "❌ Failed";
             String steps = testCase.getSteps(); // Keep HTML content as is
             String testKeyUrl = "https://freshworks.freshrelease.com/ws/FS/test-cases/" + testCase.getKey();
 
@@ -412,6 +414,8 @@ public class HtmlReportGenerator {
                                         <button class="steps-toggle" onclick="toggleSteps(%d)">Show More</button>
                                     </div>
                                 </td>
+                                <td>%d</td>
+                                <td>%d</td>
                             </tr>
                             """,
                     i + 1, // Sequence number starting from 1
@@ -422,7 +426,7 @@ public class HtmlReportGenerator {
                     testCase.getDuration(),
                     i, steps,
                     i, steps,
-                    i));
+                    i, testCase.getInputTokens(), testCase.getOutputTokens()));
         }
 
         table.append("""

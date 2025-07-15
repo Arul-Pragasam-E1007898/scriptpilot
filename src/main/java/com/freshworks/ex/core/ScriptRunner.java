@@ -1,5 +1,6 @@
 package com.freshworks.ex.core;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.freshworks.ex.proxy.*;
@@ -29,10 +30,12 @@ public class ScriptRunner {
     private static final String key = System.getenv("CLOUDVERSE_TOKEN");
 
     // Create the chat model
+    private static final TokenUsageListener listener = new TokenUsageListener();
     private static final ChatModel chatModel = CloudVerseModel.builder()
             .baseUrl("https://cloudverse.freshworkscorp.com/api/v2")
             .modelName("Azure-GPT-4.1")
             .apiKey(key)
+            .listeners(List.of(listener))
             .build();
     private final ScriptLogger scriptLogger;
 
@@ -43,6 +46,7 @@ public class ScriptRunner {
     public void execute(List<TestCase> testCases) {
         Assistant assistant = init();
         for (TestCase testcase : testCases) {
+            listener.reset();
             logger.info("\u001B[34mRunning testcase {}\u001B[0m", testcase.getKey());
             execute(testcase, assistant);
         }
@@ -62,6 +66,9 @@ public class ScriptRunner {
     private void log(TestCase tc, boolean status, long elapsed) {
         tc.setStatus(status);
         tc.setDuration(elapsed / 1000);
+        tc.setInputTokens(listener.getTotalInputTokens());
+        tc.setOutputTokens(listener.getTotalInputTokens());
+
         if (status) {
             System.out.println(GREEN + "Execution Status: ✅" + RESET);
         } else {
