@@ -67,7 +67,7 @@ public class ScriptRunner {
         tc.setStatus(status);
         tc.setDuration(elapsed / 1000);
         tc.setInputTokens(listener.getTotalInputTokens());
-        tc.setOutputTokens(listener.getTotalInputTokens());
+        tc.setOutputTokens(listener.getTotalOutputTokens());
 
         if (status) {
             System.out.println(GREEN + "Execution Status: ✅" + RESET);
